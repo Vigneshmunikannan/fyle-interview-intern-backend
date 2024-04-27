@@ -24,7 +24,12 @@ def authenticate_principal(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         p_str = request.headers.get('X-Principal')
-        assertions.assert_auth(p_str is not None, 'principal not found')
+        if p_str is None:
+            return {"error": "header value is not found"}, 400
+        # Check if the value of X-Principal is not an empty string
+        if not p_str.strip():
+            return {"error": "header value is empty"}, 400
+        assertions.assert_auth(p_str is not None and p_str.strip(), 'principal not found')
         p_dict = json.loads(p_str)
         p = AuthPrincipal(
             user_id=p_dict['user_id'],
@@ -40,7 +45,7 @@ def authenticate_principal(func):
         elif request.path.startswith('/principal'):
             assertions.assert_true(p.principal_id is not None, 'requester should be a principal')
         else:
-            assertions.assert_found(None, 'No such api')
-
+            assertions.assert_found(None, 'No such API')
         return func(p, *args, **kwargs)
     return wrapper
+

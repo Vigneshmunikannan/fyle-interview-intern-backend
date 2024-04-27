@@ -44,7 +44,7 @@ def test_grade_assignment_cross(client, h_teacher_2):
     assert data['error'] == 'FyleError'
 
 
-def test_grade_assignment_bad_grade(client, h_teacher_1):
+def test_grade_assignment_bad_grade(client, h_teacher_1): 
     """
     failure case: API should allow only grades available in enum
     """

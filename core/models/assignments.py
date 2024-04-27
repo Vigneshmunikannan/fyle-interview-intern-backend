@@ -60,6 +60,7 @@ class Assignment(db.Model):
         return assignment
 
     @classmethod
+    @classmethod
     def submit(cls, _id, teacher_id, auth_principal: AuthPrincipal):
         assignment = Assignment.get_by_id(_id)
         assertions.assert_found(assignment, 'No assignment with this id was found')
@@ -67,6 +68,7 @@ class Assignment(db.Model):
         assertions.assert_valid(assignment.content is not None, 'assignment with empty content cannot be submitted')
 
         assignment.teacher_id = teacher_id
+        assignment.state = AssignmentStateEnum.SUBMITTED  # Update the state to 'SUBMITTED'
         db.session.flush()
 
         return assignment

@@ -22,6 +22,8 @@ def list_assignments(p):
 @decorators.authenticate_principal
 def upsert_assignment(p, incoming_payload):
     """Create or Edit an assignment"""
+    if incoming_payload['content'] is None or incoming_payload['content']=="":
+        return {"error": "Assignment content is null"}, 400
     assignment = AssignmentSchema().load(incoming_payload)
     assignment.student_id = p.student_id
 
@@ -38,6 +40,9 @@ def submit_assignment(p, incoming_payload):
     """Submit an assignment"""
     submit_assignment_payload = AssignmentSubmitSchema().load(incoming_payload)
 
+    assignment = Assignment.get_by_id(incoming_payload['id'])
+    if assignment.state!="DRAFT":
+        return {"error": "FyleError","message":"only a draft assignment can be submitted"}, 400  
     submitted_assignment = Assignment.submit(
         _id=submit_assignment_payload.id,
         teacher_id=submit_assignment_payload.teacher_id,
@@ -45,4 +50,10 @@ def submit_assignment(p, incoming_payload):
     )
     db.session.commit()
     submitted_assignment_dump = AssignmentSchema().dump(submitted_assignment)
-    return APIResponse.respond(data=submitted_assignment_dump)
+    extracted_data = {
+        "student_id": submitted_assignment_dump["student_id"],
+        "state": submitted_assignment_dump["state"],
+        "teacher_id": submitted_assignment_dump["teacher_id"]
+    }
+    print(submit_assignment)
+    return APIResponse.respond(data=extracted_data)
