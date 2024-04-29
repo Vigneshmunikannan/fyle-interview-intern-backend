@@ -38,19 +38,10 @@ def list_teachers(p):
 @decorators.accept_payload
 @decorators.authenticate_principal
 def grade_assignment(p, incoming_payload):
-    # Load the incoming payload
     grade_assignment_payload = AssignmentGradeSchema().load(incoming_payload)
-    
-    # Search for the assignment by ID
-    # assignment = Assignment.query.get(grade_assignment_payload.id)
     assignment = Assignment.get_by_id(grade_assignment_payload.id)
     if assignment.state=="DRAFT":
         return {"error": "Assignment state is None"}, 400
-
-    # Check if the assignment status is 'DRAFT'
-    # if assignment.status == 'DRAFT':
-    #     abort(400, description="Cannot grade a draft assignment")
-
     # Mark the grade for the assignment
     graded_assignment = Assignment.mark_grade(
         _id=grade_assignment_payload.id,

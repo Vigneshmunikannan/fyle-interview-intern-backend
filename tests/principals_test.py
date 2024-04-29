@@ -59,3 +59,10 @@ def test_regrade_assignment(client, h_principal):
 
     assert response.json['data']['state'] == AssignmentStateEnum.GRADED.value
     assert response.json['data']['grade'] == GradeEnum.B
+
+
+def test_list_teachers(client, h_principal):
+    """Test the list teachers route."""
+    response = client.get('/principal/teachers', headers=h_principal)
+    assert response.status_code == 200
+    assert isinstance(response.json['data'], list)
